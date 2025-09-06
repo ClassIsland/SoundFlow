@@ -393,7 +393,7 @@ jobs:
 
       - name: Install Native Libraries
         run: |
-          Expand-Archive -Path "./native-libraries/native-libraries/native-libraries.zip" -DestinationPath "./Src/Backends/MiniAudio/" -Force
+          Expand-Archive -Path "./native-libraries/native-libraries.zip" -DestinationPath "./Src/Backends/MiniAudio/" -Force
         
       - name: Build Nuget packages
         env:
