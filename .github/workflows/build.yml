@@ -242,6 +242,30 @@ jobs:
     container: ${{ matrix.platform == 'Linux' && 'debian:buster-slim' || '' }}
 
     steps:
+      - name: UpdateSource (Linux)
+        if: matrix.platform == 'Linux'
+        run: |
+            rm /etc/apt/sources.list
+            echo 'deb http://archive.debian.org/debian buster main contrib non-free'  >> /etc/apt/sources.list
+            echo 'deb http://archive.debian.org/debian buster-updates main contrib non-free'  >> /etc/apt/sources.list
+            echo 'deb http://archive.debian.org/debian-security buster/updates main contrib non-free'  >> /etc/apt/sources.list
+      - name: InstallTool (Linux)
+        if: matrix.platform == 'Linux'
+        run: |
+            dpkg --add-architecture arm64
+            apt-get clean
+            apt-get update
+            apt-get install libicu-dev -y
+            apt-get install libssl-dev -y
+            apt-get install wget -y
+            apt-get install curl -y
+            apt-get install clang llvm -y
+            apt-get install gcc-aarch64-linux-gnu -y
+            apt-get install binutils-aarch64-linux-gnu -y
+            apt-get install zlib1g-dev -y
+            apt-get install zlib1g-dev:arm64 -y
+            apt-get install git -y
+
       - uses: actions/checkout@v3
 
       - name: Checkout submodules
@@ -284,28 +308,6 @@ jobs:
           "PATH=$dumpbinPath;$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       # Linux/Android dependencies
-      - name: UpdateSource (Linux)
-        if: matrix.platform == 'Linux'
-        run: |
-            rm /etc/apt/sources.list
-            echo 'deb http://archive.debian.org/debian buster main contrib non-free'  >> /etc/apt/sources.list
-            echo 'deb http://archive.debian.org/debian buster-updates main contrib non-free'  >> /etc/apt/sources.list
-            echo 'deb http://archive.debian.org/debian-security buster/updates main contrib non-free'  >> /etc/apt/sources.list
-      - name: InstallTool (Linux)
-        if: matrix.platform == 'Linux'
-        run: |
-            dpkg --add-architecture arm64
-            apt-get clean
-            apt-get update
-            apt-get install libicu-dev -y
-            apt-get install libssl-dev -y
-            apt-get install wget -y
-            apt-get install curl -y
-            apt-get install clang llvm -y
-            apt-get install gcc-aarch64-linux-gnu -y
-            apt-get install binutils-aarch64-linux-gnu -y
-            apt-get install zlib1g-dev -y
-            apt-get install zlib1g-dev:arm64 -y
       - name: Install Dependencies (Linux)
         if: matrix.platform == 'Linux'
         run: |
