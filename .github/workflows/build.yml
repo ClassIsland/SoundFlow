@@ -179,14 +179,14 @@ jobs:
             cmake_target_arch: x64
             lib_extension: ".so"
 
-          - os: ubuntu-22.04
+          - os: ubuntu-22.04-arm
             rid: linux-arm
             platform: Linux
             arch: armv7l
             cmake_target_arch: arm
             lib_extension: ".so"
 
-          - os: ubuntu-22.04
+          - os: ubuntu-22.04-arm
             rid: linux-arm64
             platform: Linux
             arch: aarch64
