@@ -282,9 +282,9 @@ jobs:
         if: matrix.platform == 'Windows'
         uses: microsoft/setup-msbuild@v2
 
-      - name: Install Windows SDK (Windows)
-        if: matrix.platform == 'Windows'
-        uses: GuillaumeFalourd/setup-windows10-sdk-action@v2.4
+      # - name: Install Windows SDK (Windows)
+      #   if: matrix.platform == 'Windows'
+      #   uses: GuillaumeFalourd/setup-windows10-sdk-action@v2.4
 
       - name: Install VS Build Tools
         if: matrix.platform == 'Windows'
@@ -297,7 +297,6 @@ jobs:
           
           # Install Visual Studio Build Tools
           choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64" --no-progress
-          choco install windows-sdk-10-version-20348-all --no-progress
 
           # Find and set dumpbin path
           $vsPath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC"
@@ -335,7 +334,7 @@ jobs:
         shell: cmd
         working-directory: ${{ github.workspace }}/Native
         run: |
-          cmake -B build -G "%TOOLCHAIN%" -A %CMAKE_TARGET_ARCH% -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -G "%TOOLCHAIN%" -A %CMAKE_TARGET_ARCH% -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_VERSION=10.0.26100.0
         env:
           TOOLCHAIN: ${{ matrix.toolchain }}
           CMAKE_TARGET_ARCH: ${{ matrix.cmake_target_arch }}
@@ -376,7 +375,7 @@ jobs:
         shell: cmd
         working-directory: ${{ github.workspace }}/Native/build
         run: |
-          cmake --build . --config Release
+          cmake --build . --config Release -DCMAKE_SYSTEM_VERSION=10.0.26100.0
 
       - name: Build (iOS)
         if: matrix.platform == 'iOS'
