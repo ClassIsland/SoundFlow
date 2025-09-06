@@ -344,7 +344,6 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/Native
         run: |
-          cd ${{ github.workspace }}/Native
           CMAKE_FLAGS=""
           if [ "${{ matrix.platform }}" == "Android" ]; then
             CMAKE_FLAGS="-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake -DANDROID_ABI=${{ matrix.arch }} -DANDROID_PLATFORM=android-21 -DCMAKE_ANDROID_ARCH_ABI=${{ matrix.cmake_target_arch }}"
@@ -396,7 +395,6 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/Native/build
         run: |
-          cd ${{ github.workspace }}/Native
           cmake --build . --config Release
 
       # Artifact collection
@@ -414,7 +412,7 @@ jobs:
           elif [ "${{ matrix.platform }}" == "iOS" ]; then
             cp -r "${{ github.workspace }}/Native/build/Release-iphoneos/miniaudio.framework" "runtimes/${{ matrix.rid }}/native/"
           else
-            cp "${{ github.workspace }}/Native/build/libminiaudio${{ matrix.lib_extension }}" "runtimes/${{ matrix.rid }}/native/"
+            cp "./Native/build/libminiaudio${{ matrix.lib_extension }}" "runtimes/${{ matrix.rid }}/native/"
           fi
 
       # Dependency analysis
