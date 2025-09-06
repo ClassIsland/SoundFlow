@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'Native/**'
+      - '.github/workflows'
 
 jobs:
   build-freebsd-x64:
