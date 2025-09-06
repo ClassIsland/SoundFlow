@@ -22,7 +22,7 @@ echo PackageVersion:$($version -as [string])
 echo Version:$($ver -as [string])
 #dotnet clean
 
-dotnet build ./Src/SoundFlow.csproj -c Release -p:Platform="Any CPU" -p:Version=$($ver -as [string]) -p:PackageVersion=$($version -as [string]) -p:GeneratePackageOnBuild=true
-cp ./**/bin/Release/*.nupkg ./out
+dotnet pack ./Src/SoundFlow.csproj -c Release -p:Platform="Any CPU" -p:Version=$($ver -as [string]) -p:PackageVersion=$($version -as [string]) -p:GeneratePackageOnBuild=True
+Copy-Item -Recurse -Force "./**/bin/**/Release/*.nupkg" ./out
 
 Get-ChildItem ./out
