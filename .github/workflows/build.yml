@@ -265,6 +265,7 @@ jobs:
             apt-get install zlib1g-dev -y
             apt-get install zlib1g-dev:arm64 -y
             apt-get install git -y
+            apt-get install sudo -y
 
       - uses: actions/checkout@v3
         with:
