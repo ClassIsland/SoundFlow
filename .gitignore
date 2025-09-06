@@ -356,3 +356,6 @@ MigrationBackup/
 /runtimes
 /nupkgs
 /Models_Data.json
+
+# binaries
+/Src/Backends/MiniAudio/runtimes/

@@ -1,145 +1,9 @@
-name: Build Native Library
+name: Build
 
 on:
   push:
-    paths:
-      - 'Native/**'
-      - '.github/workflows/**'
 
 jobs:
-  build-freebsd-x64:
-    name: Build for FreeBSD - x86_64
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Create Build Directories on Host
-        shell: bash
-        run: |
-          mkdir -p ${{ github.workspace }}/Native/build
-          mkdir -p ${{ github.workspace }}/Native/cmake
-
-      - name: Build on FreeBSD x86_64 VM
-        uses: vmactions/freebsd-vm@v1
-        with:
-          release: "14.2"
-          arch: "x86_64"
-          usesh: true
-          prepare: |
-            pkg install -y cmake gcc
-          run: |
-            set -ex # Exit on error and print commands
-            echo "--- Current directory: $(pwd) ---"
-            echo "--- Listing GITHUB_WORKSPACE ---"
-            ls -la $GITHUB_WORKSPACE
-            cd $GITHUB_WORKSPACE/Native
-
-            echo "--- System Information (inside FreeBSD VM) ---"
-            freebsd-version
-            uname -a
-            cc --version || clang --version || gcc --version
-            cmake --version
-
-            echo "--- Configuring CMake for FreeBSD x86_64 ---"
-            CMAKE_FLAGS="-DCMAKE_SYSTEM_PROCESSOR=amd64"
-            rm -rf build
-            mkdir build
-            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release $CMAKE_FLAGS
-
-            echo "--- Building for FreeBSD x86_64 ---"
-            cmake --build build --config Release
-
-            echo "--- Built library path ---"
-            ls -l build/libminiaudio.so
-
-            echo "--- Analyzing Dependencies for FreeBSD x86_64 ---"
-            ldd build/libminiaudio.so
-
-      - name: Create Output Directory for Artifact
-        shell: bash
-        run: |
-          mkdir -p runtimes/freebsd-x64/native
-
-      - name: Copy Library for Artifact
-        shell: bash
-        run: |
-          cp "${{ github.workspace }}/Native/build/libminiaudio.so" "runtimes/freebsd-x64/native/"
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: freebsd-x64
-          path: runtimes/freebsd-x64
-
-  build-freebsd-arm64:
-    name: Build for FreeBSD - aarch64
-    runs-on: ubuntu-latest
-    needs: build-freebsd-x64
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Create Build Directories on Host
-        shell: bash
-        run: |
-          mkdir -p ${{ github.workspace }}/Native/build
-          mkdir -p ${{ github.workspace }}/Native/cmake
-
-      - name: Build on FreeBSD aarch64 VM
-        uses: vmactions/freebsd-vm@v1
-        with:
-          release: "14.2"
-          arch: "aarch64"
-          usesh: true
-          prepare: |
-            pkg install -y cmake gcc
-          run: |
-            set -ex # Exit on error and print commands
-            echo "--- Current directory: $(pwd) ---"
-            echo "--- Listing GITHUB_WORKSPACE ---"
-            ls -la $GITHUB_WORKSPACE
-            cd $GITHUB_WORKSPACE/Native
-
-            echo "--- System Information (inside FreeBSD VM) ---"
-            freebsd-version
-            uname -a
-            cc --version || clang --version || gcc --version
-            cmake --version
-
-            echo "--- Configuring CMake for FreeBSD aarch64 ---"
-            CMAKE_FLAGS="-DCMAKE_SYSTEM_PROCESSOR=arm64"
-            rm -rf build
-            mkdir build
-            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release $CMAKE_FLAGS
-
-            echo "--- Building for FreeBSD aarch64 ---"
-            cmake --build build --config Release
-
-            echo "--- Built library path ---"
-            ls -l build/libminiaudio.so
-
-            echo "--- Analyzing Dependencies for FreeBSD aarch64 ---"
-            ldd build/libminiaudio.so
-
-      - name: Create Output Directory for Artifact
-        shell: bash
-        run: |
-          mkdir -p runtimes/freebsd-arm64/native
-
-      - name: Copy Library for Artifact
-        shell: bash
-        run: |
-          cp "${{ github.workspace }}/Native/build/libminiaudio.so" "runtimes/freebsd-arm64/native/"
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: freebsd-arm64
-          path: runtimes/freebsd-arm64
-  
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -481,7 +345,7 @@ jobs:
           path: runtimes/${{ matrix.rid }}
 
   package:
-    needs: [build-freebsd-x64, build-freebsd-arm64, build]
+    needs: [build]
     runs-on: ubuntu-22.04
     steps:
       - name: Download all artifacts
@@ -500,3 +364,59 @@ jobs:
         with:
           name: native-libraries
           path: native-libraries.zip
+
+  build_nupkg:
+    runs-on: windows-latest  # For a list of available runner types, refer to
+    # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    env:
+      Solution_Name: ClassIsland.sln                       # Replace with your solution name, i.e. MyWpfApp.sln.
+      # Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Wap_Project_Directory: ClassIsland/ClassIsland    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
+      Wap_Project_Path: ClassIsland/ClassIsland/ClassIsland.csproj                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+    name: Build Nuget Packages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: List files
+        run: ls
+
+      # Install the .NET Core workload
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: native-libraries
+          path: ./native-libraries
+
+      - name: Install Native Libraries
+        run: |
+          Expand-Archive -Path "./native-libraries/native-libraries/native-libraries.zip" -DestinationPath "./Src/Backends/MiniAudio/" -Force
+        
+      - name: Build Nuget packages
+        env:
+          is_release: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          ls
+          pwsh -ep Bypass -c ./tools/release-gen/publish-nupkg.ps1 $env:is_release
+      
+      # - name: Upload Nuget packages to GitHub registry
+      #   if: ${{ github.event_name != 'pull_request' }} 
+      #   env:
+      #     GHPKG_KEY: ${{ secrets.GHPKG_KEY }}
+      #   run: |
+      #     dotnet nuget add source --username HelloWRC --password $env:GHPKG_KEY --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ClassIsland/index.json"
+      #     dotnet nuget push .\out\*.nupkg -k $env:GHPKG_KEY --source "github" --skip-duplicate
+
+      - name: Upload Nuget Packages to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: out_nupkgs
+          path: ./out/*.nupkg
