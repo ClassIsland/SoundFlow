@@ -297,7 +297,8 @@ jobs:
           
           # Install Visual Studio Build Tools
           choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64" --no-progress
-          
+          choco install windows-sdk-10-version-20348-all --no-progress
+
           # Find and set dumpbin path
           $vsPath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC"
           $latestVersion = (Get-ChildItem -Path $vsPath | Sort-Object Name -Descending | Select-Object -First 1).Name
