@@ -29,7 +29,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             -dynamic
         )
     elseif(MSVC)
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        set_property(TARGET ${LIBRARY_NAME} PROPERTY 
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif()
     
     # Windows: miniaudio.dll
