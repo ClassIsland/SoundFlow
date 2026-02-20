@@ -359,3 +359,6 @@ MigrationBackup/
 
 # binaries
 /Src/Backends/MiniAudio/runtimes/
+
+build_x86/
+CMakeSettings.json

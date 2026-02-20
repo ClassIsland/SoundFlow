@@ -184,14 +184,14 @@ internal static unsafe partial class Native
     public static partial Result DecoderUninit(nint pDecoder);
 
     [LibraryImport(LibraryName, EntryPoint = "ma_decoder_read_pcm_frames")]
-    public static partial Result DecoderReadPcmFrames(nint decoder, nint framesOut, uint frameCount,
+    public static partial Result DecoderReadPcmFrames(nint decoder, nint framesOut, ulong frameCount,
         out ulong framesRead);
 
     [LibraryImport(LibraryName, EntryPoint = "ma_decoder_seek_to_pcm_frame")]
     public static partial Result DecoderSeekToPcmFrame(nint decoder, ulong frame);
 
     [LibraryImport(LibraryName, EntryPoint = "ma_decoder_get_length_in_pcm_frames")]
-    public static partial Result DecoderGetLengthInPcmFrames(nint decoder, out uint* length);
+    public static partial Result DecoderGetLengthInPcmFrames(nint decoder, out ulong length);
 
     #endregion
 
