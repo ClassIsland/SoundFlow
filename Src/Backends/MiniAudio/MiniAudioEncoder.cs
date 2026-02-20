@@ -98,20 +98,20 @@ internal sealed unsafe class MiniAudioEncoder : ISoundEncoder
     /// MiniAudio provides the encoded data in <paramref name="pBufferIn"/>,
     /// which is then written to the internal <see cref="_stream"/>.
     /// </summary>
-    private Result WriteCallback(nint pEncoder, nint pBufferIn, ulong bytesToWrite, out ulong* pBytesWritten)
+    private Result WriteCallback(nint pEncoder, nint pBufferIn, nuint bytesToWrite, out nuint bytesWritten)
     {
         lock (_syncLock)
         {
             if (!_stream.CanWrite)
             {
-                pBytesWritten = (ulong*)0;
+                bytesWritten = 0;
                 return Result.NoDataAvailable;
             }
 
             var bytes = new ReadOnlySpan<byte>((void*)pBufferIn, (int)bytesToWrite);
             _stream.Write(bytes);
             
-            pBytesWritten = (ulong*)bytesToWrite;
+            bytesWritten = bytesToWrite;
             return Result.Success;
         }
     }

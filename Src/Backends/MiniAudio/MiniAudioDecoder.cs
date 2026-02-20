@@ -204,13 +204,13 @@ internal sealed unsafe class MiniAudioDecoder : ISoundDecoder
         Dispose(false);
     }
 
-    private Result ReadCallback(nint pDecoder, nint pBufferOut, ulong bytesToRead, out ulong* pBytesRead)
+    private Result ReadCallback(nint pDecoder, nint pBufferOut, nuint bytesToRead, out nuint bytesRead)
     {
         lock (_syncLock)
         {
             if (!_stream.CanRead)
             {
-                pBytesRead = (ulong*)0;
+                bytesRead = 0;
                 return Result.NoDataAvailable;
             }
 
@@ -232,7 +232,7 @@ internal sealed unsafe class MiniAudioDecoder : ISoundDecoder
             // Clear read buffer
             Array.Clear(_readBuffer, 0, _readBuffer.Length);
 
-            pBytesRead = (ulong*)read;
+            bytesRead = (nuint)read;
             return Result.Success;
         }
     }

@@ -18,8 +18,8 @@ internal static unsafe partial class Native
     public delegate Result BufferProcessingCallback(
         nint pCodecContext,          // The native decoder/encoder instance pointer (ma_decoder*, ma_encoder*)
         nint pBuffer,                // The buffer pointer (void* pBufferOut or const void* pBufferIn)
-        ulong bytesRequested,        // The number of bytes requested (bytesToRead or bytesToWrite)
-        out ulong* bytesTransferred   // The actual number of bytes processed/transferred (size_t*)
+        nuint bytesRequested,        // The number of bytes requested (bytesToRead or bytesToWrite)
+        out nuint bytesTransferred   // The actual number of bytes processed/transferred (size_t*)
     );
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
